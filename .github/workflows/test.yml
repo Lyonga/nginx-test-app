@@ -29,6 +29,6 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
         
     - name: Push Docker Image
-      uses: lyonga/project/push-action@v1
+      uses: lyonga/push-action@v1
       with:
         tags: devops/image:${{ env.GITHUB_SHA }}
