@@ -7,7 +7,7 @@ provider "aws" {
 resource "aws_s3_bucket" "bucket_name" {
   bucket = "bucket-name-test-101-lyonchar"
   tags = {
-    Name        = "test bucket"
+    Name        = "test-bucket"
     Environment = "Dev"
   }
 }
