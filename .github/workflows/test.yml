@@ -32,4 +32,4 @@ jobs:
       uses: docker/push-action@v2
       with:
         tags: GA:${{ env.GITHUB_SHA }}
-        repository: lyonga/project
+        repository: demo-repo
