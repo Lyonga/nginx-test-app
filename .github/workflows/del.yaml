@@ -17,7 +17,7 @@ jobs:
         uses: phpdocker-io/github-actions-delete-abandoned-branches@v1
         id: delete_stuff
         with:
-          github_token: ${{DELETE_TOKEN}}
+          github_token: ${{secrets.DELETE_TOKEN}}
           last_commit_age_days: 100
           ignore_branches: deploy/gha/dev,deploy/gha/qa,deploy/gha/prod,development
           github_base_url: https://api.github.com
