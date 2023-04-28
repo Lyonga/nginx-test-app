@@ -18,12 +18,12 @@ jobs:
         id: delete_stuff
         with:
           github_token: ${{secrets.DELETE_TOKEN}}
-          last_commit_age_days: 100
+          last_commit_age_days: 30
           ignore_branches: deploy/gha/dev,deploy/gha/qa,deploy/gha/prod,development
           github_base_url: https://api.github.com
 
           # Disable dry run and actually get stuff deleted
-          dry_run: no
+          dry_run: yes
 
       - name: Get output
         run: "echo 'Deleted branches: ${{ steps.delete_stuff.outputs.deleted_branches }}'"
