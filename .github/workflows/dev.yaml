@@ -1,0 +1,33 @@
+
+name: Housekeeping repo cleanup
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' 
+
+jobs:
+  stale_branches:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Stale Branches
+      uses: crs-k/stale-branches@v3
+      with:
+        repo-token: '${{ secrets.DELETE_TOKEN}}'
+        days-before-stale: 30
+        days-before-delete: 35 # set to 0 to disable deletion
+        comment-updates: false
+        delete: true
+        max-issues: 20
+        tag-committer: false
+        stale-branch-label: 'stale branch 🗑️'
+        compare-branches: 'info'
+        exclude-branches: 'deploy*/*dev,deploy*/*qa,deploy*/*prod,development*'
+    - name: Archive to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --exclude "*" --include "*.zip" --delete
+        source_dir: ./stale-repos
+        aws_s3_bucket: webtutorial-103
+        aws_s3_region: us-east-1
+        aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
+        aws_secret_access_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
