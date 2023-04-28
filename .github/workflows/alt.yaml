@@ -2,7 +2,7 @@ name: CLEAR OLD BRANCHES
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    #- cron: '*/30 * * * *'
 jobs:
   cleaning:
     name: Cleanup old branches
