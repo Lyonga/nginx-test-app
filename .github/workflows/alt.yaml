@@ -1,0 +1,21 @@
+name: CLEAR OLD BRANCHES
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+jobs:
+  cleaning:
+    name: Cleanup old branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: clean
+        uses: beatlabs/delete-old-branches-action@v0.0.6
+        with:
+          repo_token: ${{ secrets.DELETE_TOKEN}}
+          date: '2 month ago'
+          dry_run: false
+          delete_tags: false
+          minimum_tags: 5
+          extra_protected_branch_regex: master.*|main|dev|qa|prod|^deploy.*|.*/dev,/qa,/prod$
