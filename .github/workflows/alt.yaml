@@ -18,4 +18,4 @@ jobs:
           dry_run: false
           delete_tags: false
           minimum_tags: 5
-          extra_protected_branch_regex: master.*|main|dev|qa|prod|^deploy.*|.*/dev,/qa,/prod$
+          extra_protected_branch_regex: main|dev|qa|prod|^deploy.*|.*/dev,/qa,/prod$
