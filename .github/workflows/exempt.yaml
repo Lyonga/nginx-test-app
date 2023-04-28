@@ -2,7 +2,7 @@ name: Clean and exempt
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    #- cron: "*/10 * * * *"
 
 jobs:
   remove-stale-branches:
