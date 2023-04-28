@@ -1,4 +1,5 @@
 name: Clean and exempt
+
 on:
   schedule:
     - cron: "*/10 * * * *"
@@ -11,10 +12,12 @@ jobs:
       - uses: fpicalausa/remove-stale-branches@v1
         with:
           dry-run: true # Check out the console output before setting this to false
-          exempt-organization: "acme-inc"
+          exempt-organization: "cfa-corp"
           exempt-authors-regex: "^dependabot"
           days-before-branch-stale: 30
           days-before-branch-delete: 30
-          exempt-branches-regex: ^(development|production|deploy.*\b(dev|qa|prod))$
-          github-token: ${{secrets.DELETE_TOKEN}}
-          stale-branch-message: @{author} Your branch [{branchName}]({branchUrl}) hasn't been updated in the last 60 days and is marked as stale and deleted.
+          exempt-branches-regex: "^(development|production|deploy.*\b(dev|qa|prod))$"
+          github-token: ${{ secrets.DELETE_TOKEN }}
+          stale-branch-message: "@{author} Your branch [{branchName}]({branchUrl}) hasn't been updated in the last 60 days and is marked as stale and deleted."
+          exempt-protected-branches: true
+          operations-per-run: 30
