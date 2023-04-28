@@ -1,21 +1,40 @@
-name: CLEAR OLD BRANCHES
+name: Clean and archive to s3
 
 on:
+  # Run daily at midnight
   schedule:
-    #- cron: '*/30 * * * *'
+    - cron: '*/10 * * * *'
+
+  # Allow workflow to be manually run from the GitHub UI
+  workflow_dispatch:
+
 jobs:
-  cleaning:
-    name: Cleanup old branches
+  cleanup_old_branches:
     runs-on: ubuntu-latest
+    name: Satisfy my repo CDO
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: clean
-        uses: beatlabs/delete-old-branches-action@v0.0.6
+      - name: Delete those pesky dead branches
+        uses: phpdocker-io/github-actions-delete-abandoned-branches@v1
+        id: delete_stuff
         with:
-          repo_token: ${{ secrets.DELETE_TOKEN}}
-          date: '2 month ago'
-          dry_run: false
-          delete_tags: false
-          minimum_tags: 5
-          extra_protected_branch_regex: main|dev|qa|prod|^deploy.*|.*/dev,/qa,/prod$
+          github_token: ${{secrets.DELETE_TOKEN}}
+          last_commit_age_days: 30
+          ignore_branches: deploy/gha/dev,deploy/gha/qa,deploy/gha/prod,development,production
+          github_base_url: https://api.github.com
+
+          # Disable dry run and actually get stuff deleted
+          dry_run: no
+
+      - name: Archive to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --exclude "*" --include "*.zip" --delete
+          source_dir: ./stale-repos
+          aws_s3_bucket: webtutorial-103
+          aws_s3_region: us-east-1
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get output
+        run: "echo 'Deleted branches: ${{ steps.delete_stuff.outputs.deleted_branches }}'"
+
