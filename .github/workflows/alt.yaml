@@ -35,6 +35,11 @@ jobs:
 #           aws_s3_region: us-east-1
 #           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
 #           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
           
       - name: Sync to S3
         uses: jakejarvis/s3-sync-action@master
