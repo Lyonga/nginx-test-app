@@ -25,16 +25,26 @@ jobs:
           # Disable dry run and actually get stuff deleted
           dry_run: no
 
-      - name: Archive to S3
+#       - name: Archive to S3
+#         uses: jakejarvis/s3-sync-action@master
+#         with:
+#           args: --exclude "*" --include "*.zip" --delete
+#           source_dir: ./stale-repos
+#           aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
+#           #aws_s3_bucket: webtutorial-103
+#           aws_s3_region: us-east-1
+#           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+      - name: Sync to S3
         uses: jakejarvis/s3-sync-action@master
         with:
-          args: --exclude "*" --include "*.zip" --delete
-          source_dir: ./stale-repos
-          aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
-          #aws_s3_bucket: webtutorial-103
-          aws_s3_region: us-east-1
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          entryPoint: sh
+          args: -c 'aws s3 sync /path/to/directory s3://bucket-name --delete'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
 
       - name: Get output
         run: "echo 'Deleted branches: ${{ steps.delete_stuff.outputs.deleted_branches }}'"
