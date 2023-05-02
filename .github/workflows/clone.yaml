@@ -23,13 +23,7 @@ jobs:
           last_commit_age_days: 30
           ignore_branches: deploy/gha/dev,deploy/gha/qa,deploy/gha/prod,development,production
           github_base_url: https://api.github.com
-          dry_run: no
-
-      - name: Create new branch and merge stale branches
-        run: |
-          git checkout -b new-branch
-          git merge --no-edit $(git branch --merged | grep -vE 'master|main|dev')
-        working-directory: ${{ github.workspace }}
+          dry_run: yes
 
       - name: Archive and upload new branch to S3
         run: |
@@ -42,11 +36,5 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Delete stale branches
-        uses: phpdocker-io/github-actions-delete-abandoned-branches@v1
-        with:
-          github_token: ${{ secrets.DELETE_TOKEN }}
-          last_commit_age_days: 30
-          ignore_branches: deploy/gha/dev,deploy/gha/qa,deploy/gha/prod,development,production
-          github_base_url: https://api.github.com
-          dry_run: no
+      - name: Get output
+        run: "echo 'Deleted branches: ${{ steps.delete_stuff.outputs.deleted_branches }}'"
