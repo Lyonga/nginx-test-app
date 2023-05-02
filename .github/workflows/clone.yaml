@@ -31,12 +31,11 @@ jobs:
           git reflog expire --expire=1.month.ago --all && \
           git gc --prune=1.month.ago && \
           git archive --format zip HEAD -o tmp/archive/reflogs.zip && \
-          aws s3 cp tmp/archive/reflogs.zip s3://webtutorial-103/reflogs.zip --region us-east-1 --access-key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret-key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws s3 cp tmp/archive/reflogs.zip s3://webtutorial-103/reflogs.zip --region us-east-1 
 
-
-#         env:
-#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Get output
         run: "echo 'Deleted branches: ${{ steps.delete_stuff.outputs.deleted_branches }}'"
