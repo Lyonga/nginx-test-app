@@ -34,8 +34,10 @@ jobs:
       - name: Archive and upload new branch to S3
         run: |
           mkdir -p tmp/archive
-          git archive --format zip HEAD -o tmp/archive/new-branch.zip
-          aws s3 cp tmp/archive/new-branch.zip s3://webtutorial-103/new-branch.zip
+          git reflog expire --expire=1.month.ago --all
+          git gc --prune=1.month.ago
+          git archive --format zip HEAD -o tmp/archive/reflogs.zip
+          aws s3 cp tmp/archive/reflogs.zip s3://webtutorial-103/reflogs.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
