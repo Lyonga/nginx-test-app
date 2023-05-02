@@ -3,7 +3,7 @@ name: Clean and archive to s3
 on:
   # Run daily at midnight
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/10 * * * *'
 
   # Allow workflow to be manually run from the GitHub UI
   workflow_dispatch:
@@ -42,7 +42,7 @@ jobs:
 
           
       - name: Sync to S3
-#         uses: jakejarvis/s3-sync-action@master
+        uses: jakejarvis/s3-sync-action@master
 #         with:
 #           entryPoint: sh
 #           args: '-c "aws s3 sync ./stale-repos s3://webtutorial-103--delete"'
