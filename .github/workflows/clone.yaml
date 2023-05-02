@@ -1,0 +1,50 @@
+name: Clone and archive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  cleanup_old_branches:
+    runs-on: ubuntu-latest
+    name: Satisfy my repo CDO
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Delete those pesky dead branches
+        uses: phpdocker-io/github-actions-delete-abandoned-branches@v1
+        id: delete_stuff
+        with:
+          github_token: ${{ secrets.DELETE_TOKEN }}
+          last_commit_age_days: 30
+          ignore_branches: deploy/gha/dev,deploy/gha/qa,deploy/gha/prod,development,production
+          github_base_url: https://api.github.com
+          dry_run: no
+
+      - name: Create new branch and merge stale branches
+        run: |
+          git checkout -b new-branch
+          git merge --no-edit $(git branch --merged | grep -vE 'master|main|dev')
+        working-directory: ${{ github.workspace }}
+
+      - name: Archive and upload new branch to S3
+        run: |
+          mkdir -p tmp/archive
+          git archive --format zip HEAD -o tmp/archive/new-branch.zip
+          aws s3 cp tmp/archive/new-branch.zip s3://webtutorial-103/new-branch.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Delete stale branches
+        uses: phpdocker-io/github-actions-delete-abandoned-branches@v1
+        with:
+          github_token: ${{ secrets.DELETE_TOKEN }}
+          last_commit_age_days: 30
+          ignore_branches: deploy/gha/dev,deploy/gha/qa,deploy/gha/prod,development,production
+          github_base_url: https://api.github.com
+          dry_run: no
