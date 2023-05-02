@@ -24,6 +24,11 @@ jobs:
 
           # Disable dry run and actually get stuff deleted
           dry_run: no
+          
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
 
       - name: Archive stale branches to S3
         run: |
