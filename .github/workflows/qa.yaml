@@ -1,4 +1,4 @@
-name: Clean and archive to s3
+name: Archive to s3
 
 on:
   # Run daily at midnight
