@@ -36,7 +36,7 @@ jobs:
         run: |
           while read branch; do
             git archive --format zip HEAD $branch -o ${branch}.zip
-            aws s3 cp ${branch}.zip s3://webtutorial-103/${branch}.zip
+            aws s3 cp ${branch}.zip s3://webtutorial-103/${branch}.zip --region us-east-1
           done < stale-branches.txt
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
