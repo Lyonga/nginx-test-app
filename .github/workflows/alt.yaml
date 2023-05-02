@@ -1,11 +1,10 @@
 name: Clean and archive to s3
 
 on:
-  # Run daily at midnight
-  schedule:
-    - cron: '*/10 * * * *'
 
-  # Allow workflow to be manually run from the GitHub UI
+  schedule:
+    #- cron: '*/10 * * * *'
+
   workflow_dispatch:
 
 jobs:
