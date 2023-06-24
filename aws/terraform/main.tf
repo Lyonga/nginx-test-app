@@ -65,7 +65,7 @@ resource "aws_ecs_service" "default" {
 # Create a security group
 resource "aws_security_group" "ecs_security_group" {
   name        = "ecs-security-group"
-  vpc_id      = "vpc-12345678"
+  vpc_id      = "vpc-8f8856f2"
   description = "ECS Security Group"
 
   ingress {
@@ -90,7 +90,7 @@ resource "aws_lb_target_group" "ecs_target_group" {
   name        = "ecs-target-group"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = "vpc-12345678"  
+  vpc_id      = "vpc-8f8856f2"  
 
   health_check {
     path = "/"
