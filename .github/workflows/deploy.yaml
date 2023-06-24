@@ -1,0 +1,51 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Deploy Terraform for ECS
+        run: |
+          cd aws/terraform 
+          terraform init
+          terraform apply -auto-approve
+
+      - name: Configure AWS ECS
+        run: |
+          aws ecs configure --region us-east-1 
+
+      - name: Pull Docker image
+        run: |
+          docker pull lyonga/demo-repo:latest 
+
+      - name: Tag Docker image
+        run: |
+          docker tag lyonga/demo-repo:latest testCluster.dkr.ecr.us-east-1.amazonaws.com/demo:latest
+
+      - name: Push Docker image to AWS ECR
+        run: |
+          docker push testCluster.dkr.ecr.us-east-1.amazonaws.com/demo:latest
+
+      - name: Update ECS service
+        run: |
+          aws ecs update-service --cluster testCluster --service testwebapp --force-new-deployment
+
