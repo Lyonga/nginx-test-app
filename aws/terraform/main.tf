@@ -99,7 +99,7 @@ resource "aws_lb_target_group" "ecs_target_group" {
 }
 
 resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.alb.arn
+  load_balancer_arn = aws_lb.ecs_load_balancer.arn
   port              = 80
   protocol          = "HTTP"
 
