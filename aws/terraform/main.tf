@@ -49,7 +49,6 @@ resource "aws_ecs_service" "default" {
   force_new_deployment    = true
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.ecs_target_group.arn
     container_name   = "app"
     container_port   = 80
   }
@@ -96,6 +95,17 @@ resource "aws_lb_target_group" "ecs_target_group" {
   health_check {
     path = "/"
     port = 80
+  }
+}
+
+resource "aws_lb_listener" "listener" {
+  load_balancer_arn = aws_lb.alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ecs_target_group.arn
   }
 }
 
