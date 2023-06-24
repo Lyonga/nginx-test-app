@@ -49,7 +49,7 @@ resource "aws_ecs_service" "default" {
   force_new_deployment    = true
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.default.arn
+    target_group_arn = aws_alb_target_group.ecs_target_group.arn
     container_name   = "app"
     container_port   = 80
   }
