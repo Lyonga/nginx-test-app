@@ -3,7 +3,7 @@ resource "aws_ecs_cluster" "test" {
     create_before_destroy = true
   }
 
-  name = "test"
+  name = "testCluster"
 
   setting {
     name  = "containerInsights"
@@ -55,17 +55,18 @@ resource "aws_ecs_service" "default" {
   }
 
   network_configuration {
-    subnets         = ["subnet-12345678", "subnet-87654321"]  #Replace with your desired subnet ID(s)
+    subnets         = ["subnet-836b2f8d", "subnet-fef97b98"] 
     security_groups = [aws_security_group.ecs_security_group.id]
   }
 
-  name            = "blog"
+  name            = "testwebapp"
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
 }
 
 # Create a security group
 resource "aws_security_group" "ecs_security_group" {
   name        = "ecs-security-group"
+  vpc_id      = "vpc-12345678"
   description = "ECS Security Group"
 
   ingress {
@@ -90,7 +91,7 @@ resource "aws_lb_target_group" "ecs_target_group" {
   name        = "ecs-target-group"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = "vpc-12345678"  # Replace with your VPC ID
+  vpc_id      = "vpc-12345678"  
 
   health_check {
     path = "/"
