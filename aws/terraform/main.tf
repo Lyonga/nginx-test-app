@@ -18,43 +18,46 @@ resource "aws_ecs_cluster" "test" {
 
 # Create a task definition
 resource "aws_ecs_task_definition" "ecs_task_definition" {
-  family                = "ecs-task"
-  container_definitions = <<EOF
-[
-  {
-    "name": "my-container",
-    "image": "nginx",
-    "portMappings": [
-      {
-        "containerPort": 80,
-        "hostPort": 80,
-        "protocol": "tcp"
-      }
-    ]
-  }
-]
-EOF
-
-  task_role_arn       = aws_iam_role.ecs_task_role.arn
-  execution_role_arn  = aws_iam_role.ecs_task_execution_role.arn
-  requires_compatibilities = ["FARGATE"]
-  cpu = "256"
-  memory = "512"
+  family                   = "ecs-task"
+  container_definitions    = <<DEFINITION
+  [
+    {
+      "name": "my-first-task",
+      "image": "${aws_ecr_repository.demo.repository_url}",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000
+        }
+      ],
+      "memory": 512,
+      "cpu": 256
+    }
+  ]
+  DEFINITION
+  requires_compatibilities = ["FARGATE"] # Stating that we are using ECS Fargate
+  network_mode             = "awsvpc"    # Using awsvpc as our network mode as this is required for Fargate
+  memory                   = 512         # Specifying the memory our container requires
+  cpu                      = 256         # Specifying the CPU our container requires
+  execution_role_arn       = "${aws_iam_role.ecsTaskExecutionRole.arn}"
 }
 
-resource "aws_ecs_service" "default" {
+resource "aws_ecs_service" "ecs-service" {
   cluster                 = aws_ecs_cluster.test.id
   desired_count           = 1
   enable_ecs_managed_tags = true
   force_new_deployment    = true
 
   load_balancer {
+    target_group_arn = "${aws_lb_target_group.ecs_target_group.arn}"
     container_name   = "app"
-    container_port   = 80
+    container_port   = 3000
   }
 
   network_configuration {
-    subnets         = ["subnet-836b2f8d", "subnet-fef97b98"] 
+    subnets         = ["subnet-836b2f8d", "subnet-fef97b98"]
+    assign_public_ip = true
     security_groups = [aws_security_group.ecs_security_group.id]
   }
 
@@ -80,7 +83,7 @@ resource "aws_security_group" "ecs_security_group" {
 resource "aws_lb" "ecs_load_balancer" {
   name               = "ecs-load-balancer"
   load_balancer_type = "application"
-  subnets            = ["subnet-12345678", "subnet-87654321"]  # Replace with your desired subnet ID(s)
+  subnets            = ["subnet-12345678", "subnet-87654321"]  
 
   security_groups = [aws_security_group.ecs_security_group.id]
 }
@@ -92,59 +95,35 @@ resource "aws_lb_target_group" "ecs_target_group" {
   protocol    = "HTTP"
   vpc_id      = "vpc-8f8856f2"  
 
+  default_action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.ecs_load_balancer.arn}" 
+  }
+
   health_check {
     path = "/"
     port = 80
   }
 }
 
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.ecs_load_balancer.arn
-  port              = 80
-  protocol          = "HTTP"
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ecs_target_group.arn
+resource "aws_iam_role" "ecsTaskExecutionRole" {
+  name               = "ecsTaskExecutionRole"
+  assume_role_policy = "${data.aws_iam_policy_document.assume_role_policy.json}"
+}
+
+data "aws_iam_policy_document" "assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
   }
 }
 
-# Create an IAM role for ECS task execution
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecs-task-execution-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-# Create an IAM role for ECS task
-resource "aws_iam_role" "ecs_task_role" {
-  name = "ecs-task-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
+  role       = "${aws_iam_role.ecsTaskExecutionRole.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
