@@ -67,7 +67,7 @@ resource "aws_ecs_service" "ecs-service" {
 
 # Create a security group
 resource "aws_security_group" "ecs_security_group" {
-  name        = "ecs-security-group"
+  name        = "ecs-new-security-group"
   vpc_id      = "vpc-8f8856f2"
   description = "ECS Security Group"
 
@@ -90,7 +90,7 @@ resource "aws_lb" "ecs_load_balancer" {
 
 # Create a target group for the load balancer
 resource "aws_lb_target_group" "ecs_target_group" {
-  name        = "ecs-target-group"
+  name        = "ecs-new-target-group"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = "vpc-8f8856f2"  
