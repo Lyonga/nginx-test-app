@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   [
     {
       "name": "my-first-task",
-      "image": "${aws_ecr_repository.demo.repository_url}",
+      "image": "lyonga/launch:nginxApp",
       "essential": true,
       "portMappings": [
         {
@@ -95,17 +95,20 @@ resource "aws_lb_target_group" "ecs_target_group" {
   protocol    = "HTTP"
   vpc_id      = "vpc-8f8856f2"  
 
-  default_action {
-    type             = "forward"
-    target_group_arn = "${aws_lb_target_group.ecs_load_balancer.arn}" 
-  }
-
   health_check {
     path = "/"
     port = 80
   }
 }
-
+resource "aws_lb_listener" "listener" {
+  load_balancer_arn = "${aws_alb.application_load_balancer.arn}" # Referencing our load balancer
+  port              = "80"
+  protocol          = "HTTP"
+  default_action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.target_group.arn}" # Referencing our tagrte group
+  }
+}
 
 resource "aws_iam_role" "ecsTaskExecutionRole" {
   name               = "ecsTaskExecutionRole"
