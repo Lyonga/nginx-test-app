@@ -56,7 +56,7 @@ resource "aws_ecs_service" "ecs-service" {
   }
 
   network_configuration {
-    subnets         = ["subnet-836b2f8d", "subnet-fef97b98"]
+    subnets         = ["subnet-836b2f8d", "subnet-ec81d3a1"]
     assign_public_ip = true
     security_groups = [aws_security_group.ecs_security_group.id]
   }
@@ -83,7 +83,7 @@ resource "aws_security_group" "ecs_security_group" {
 resource "aws_lb" "ecs_load_balancer" {
   name               = "ecs-load-balancer"
   load_balancer_type = "application"
-  subnets            = ["subnet-12345678", "subnet-87654321"]  
+  subnets            = ["subnet-836b2f8d", "subnet-ec81d3a1"]  
 
   security_groups = [aws_security_group.ecs_security_group.id]
 }
@@ -111,7 +111,7 @@ resource "aws_lb_listener" "listener" {
 }
 
 resource "aws_iam_role" "ecsTaskExecutionRole" {
-  name               = "ecsTaskExecutionRole"
+  name               = "NewecsTaskExecutionRole"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role_policy.json}"
 }
 
