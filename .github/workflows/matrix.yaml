@@ -15,12 +15,18 @@ jobs:
         with:
           ref: master
 
-      - name: Build Docker Image
+      - name: Build and Tag Docker Image
         run: |
-          docker build -t lyonga/launch/nginxapp:latest 
+          docker build -t my-dockerhub-username/nginxapp:latest .
+          docker tag lyonga/launch:latest lyonga/launch:latest
           
       - name: Push Docker Image to Docker Hub
-        run: docker push lyonga/launch/nginxapp:latest
+        uses: mr-smithers-excellent/docker-build-push@v4
+        with:
+          image: lyonga/launch:latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -35,5 +41,5 @@ jobs:
 
       - name: Tag and Push Docker Image to Amazon ECR
         run: |
-          docker tag nginx:latest ${{ steps.login-ecr.outputs.registry }}/lyonga/launch/nginxapp:latest
-          docker push ${{ steps.login-ecr.outputs.registry }}/lyonga/launch/nginxapp:latest
+          docker tag lyonga/launch:latest ${{ steps.login-ecr.outputs.registry }}/lyonga/launch:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/lyonga/launch:latest
