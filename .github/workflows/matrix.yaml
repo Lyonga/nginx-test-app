@@ -17,6 +17,10 @@ jobs:
 
       - name: Build and Tag Docker Image
         run: |
+          BRANCH_NAME=$(echo $GITHUB_REF | awk -F / '{print $NF}')
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          IMAGE_TAG="$BRANCH_NAME-$COMMIT_HASH"
+
           docker build -t lyonga/launch:latest .
           docker tag lyonga/launch:latest lyonga/launch:latest
           
