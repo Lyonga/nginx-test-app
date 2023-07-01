@@ -101,12 +101,12 @@ resource "aws_lb_target_group" "ecs_target_group" {
   }
 }
 resource "aws_lb_listener" "listener" {
-  load_balancer_arn = "${aws_alb.ecs_load_balancer.arn}" # Referencing our load balancer
+  load_balancer_arn = "${aws_lb.ecs_load_balancer.arn}" 
   port              = "80"
   protocol          = "HTTP"
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.ecs_target_group.arn}" # Referencing our tagrte group
+    target_group_arn = "${aws_lb_target_group.ecs_target_group.arn}" 
   }
 }
 
