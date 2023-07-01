@@ -1,0 +1,40 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+      - name: Build and Push Docker Image to Docker Hub
+        uses: mr-smithers-excellent/docker-build-push@v4
+        with:
+          image: lyonga/demo-repo
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+          
+      - name: Tag and Push Docker Image to Amazon ECR
+        run: |
+          docker tag lyonga/demo-repo:latest ${{ steps.login-ecr.outputs.registry }}/demo-repo:${{ github.run_number }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/demo-repo:${{ github.run_number }}
