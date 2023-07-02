@@ -22,5 +22,5 @@ jobs:
         registry: docker.io
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        image_tags: latest
+        tags: v1, latest
         
