@@ -27,7 +27,7 @@ jobs:
         run: |
           cd aws/terraform 
           terraform init
-          terraform apply -auto-approve
+          terraform destroy -auto-approve
 
       - name: Configure AWS ECS
         run: |
