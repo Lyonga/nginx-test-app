@@ -71,7 +71,7 @@ resource "aws_security_group" "ecs_security_group" {
   vpc_id      = "vpc-8f8856f2"
   description = "ECS Security Group"
   lifecycle {
-    ignore_changes = ["*"]
+    ignore_changes = all
   }
 
   ingress {
@@ -98,7 +98,7 @@ resource "aws_lb_target_group" "ecs_target_group" {
   protocol    = "HTTP"
   vpc_id      = "vpc-8f8856f2"  
   lifecycle {
-    ignore_changes = ["*"]
+    ignore_changes = all
   }
 
   health_check {
@@ -120,7 +120,7 @@ resource "aws_iam_role" "ecsTaskExecutionRole" {
   name               = "NewecsTaskExecutionRole"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role_policy.json}"
   lifecycle {
-    ignore_changes = ["*"]
+    ignore_changes = all
   }
 }
 
