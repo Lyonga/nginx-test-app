@@ -1,30 +1,25 @@
-name: Build and Push Docker Image
+name: Docker Image CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          ref: master
-
-      - name: Build and Push Docker Image
-        id: docker_build_push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: |
-            docker.io/lyonga/launch:latest
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Output Docker image digest
-        run: echo "Docker Image Digest - ${{ steps.docker_build_push.outputs.digest }}"
+    - uses: actions/checkout@v2
+    - name: docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag lyonga/launch:latest
+      
+    - name: Docker Push
+      run: docker push lyonga/launch
