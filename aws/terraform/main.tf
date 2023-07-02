@@ -61,7 +61,7 @@ resource "aws_ecs_service" "ecs-service" {
     security_groups = [aws_security_group.ecs_security_group.id]
   }
 
-  name            = "ecs-task"
+  name            = aws_ecs_task_definition.ecs_task_definition.family
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
 }
 
