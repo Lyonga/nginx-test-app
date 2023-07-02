@@ -15,25 +15,6 @@ jobs:
         with:
           ref: master
 
-      - name: Build and Tag Docker Image
-        run: |
-          BRANCH_NAME=$(echo $GITHUB_REF | awk -F / '{print $NF}')
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-          IMAGE_TAG="$BRANCH_NAME-$COMMIT_HASH"
-
-          docker build -t lyonga/launch:$IMAGE_TAG .
-          docker tag lyonga/launch:$IMAGE_TAG docker.io/lyonga/launch:$IMAGE_TAG
-          docker tag lyonga/launch:$IMAGE_TAG docker.io/lyonga/launch:latest
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          IMAGE_TAG: ${{ steps.build-and-tag.outputs.IMAGE_TAG }}
-          
-      - name: Push Docker Image to Docker Hub
-        run: |
-          docker push docker.io/lyonga/launch:$IMAGE_TAG
-          docker push docker.io/lyonga/launch:latest
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -45,7 +26,11 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Tag and Push Docker Image to Amazon ECR
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: lyonga/launch
+          IMAGE_TAG: latest
         run: |
-          docker tag lyonga/launch:latest ${{ steps.login-ecr.outputs.registry }}/lyonga/launch:latest
-          docker push ${{ steps.login-ecr.outputs.registry }}/lyonga/launch:latest
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
