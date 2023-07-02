@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   [
     {
       "name": "my-first-task",
-      "image": "lyonga/launch:nginxApp",
+      "image": "docker.io/lyonga/launch:latest",
       "essential": true,
       "portMappings": [
         {
@@ -70,6 +70,9 @@ resource "aws_security_group" "ecs_security_group" {
   name        = "ecs-new-security-group"
   vpc_id      = "vpc-8f8856f2"
   description = "ECS Security Group"
+  lifecycle {
+    ignore_changes = ["*"]
+  }
 
   ingress {
     from_port   = 80
@@ -94,6 +97,9 @@ resource "aws_lb_target_group" "ecs_target_group" {
   port        = 80
   protocol    = "HTTP"
   vpc_id      = "vpc-8f8856f2"  
+  lifecycle {
+    ignore_changes = ["*"]
+  }
 
   health_check {
     path = "/"
@@ -113,6 +119,9 @@ resource "aws_lb_listener" "listener" {
 resource "aws_iam_role" "ecsTaskExecutionRole" {
   name               = "NewecsTaskExecutionRole"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role_policy.json}"
+  lifecycle {
+    ignore_changes = ["*"]
+  }
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
