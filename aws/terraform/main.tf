@@ -67,7 +67,7 @@ resource "aws_ecs_service" "ecs-service" {
 
 # Create a security group
 resource "aws_security_group" "ecs_security_group" {
-  name        = "ecs-new-security-group"
+  name        = "ecs-test-security-group"
   vpc_id      = "vpc-8f8856f2"
   description = "ECS Security Group"
   lifecycle {
@@ -93,7 +93,7 @@ resource "aws_lb" "ecs_load_balancer" {
 
 # Create a target group for the load balancer
 resource "aws_lb_target_group" "ecs_target_group" {
-  name        = "ecs-new-target-group"
+  name        = "ecs-test-target-group"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = "vpc-8f8856f2"  
@@ -117,7 +117,7 @@ resource "aws_lb_listener" "listener" {
 }
 
 resource "aws_iam_role" "ecsTaskExecutionRole" {
-  name               = "NewecsTaskExecutionRole"
+  name               = "testecsTaskExecutionRole"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role_policy.json}"
   lifecycle {
     ignore_changes = all
