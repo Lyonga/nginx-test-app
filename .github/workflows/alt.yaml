@@ -1,57 +1,30 @@
-name: Clean and archive to s3
+name: Build and Push Docker Image
 
 on:
-
-  schedule:
-    - cron: '*/10 * * * *'
-
-  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
-  cleanup_old_branches:
+  build:
     runs-on: ubuntu-latest
-    name: Satisfy my repo CDO
+
     steps:
-      - name: Delete those pesky dead branches
-        uses: phpdocker-io/github-actions-delete-abandoned-branches@v1
-        id: delete_stuff
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
-          github_token: ${{secrets.DELETE_TOKEN}}
-          last_commit_age_days: 30
-          ignore_branches: deploy/gha/dev,deploy/gha/qa,deploy/gha/prod,development,production
-          github_base_url: https://api.github.com
+          ref: master
 
-          # Disable dry run and actually get stuff deleted
-          dry_run: no
+      - name: Build and Push Docker Image
+        id: docker_build_push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            docker.io/lyonga/demo-repo:latest
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-#       - name: Archive to S3
-#         uses: jakejarvis/s3-sync-action@master
-#         with:
-#           args: --exclude "*" --include "*.zip" --delete
-#           source_dir: ./stale-repos
-#           aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
-#           #aws_s3_bucket: webtutorial-103
-#           aws_s3_region: us-east-1
-#           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
-          
-      - name: Sync to S3
-        uses: jakejarvis/s3-sync-action@master
-#         with:
-#           entryPoint: sh
-#           args: '-c "aws s3 sync ./stale-repos s3://webtutorial-103--delete"'
-        run: |
-          aws s3 sync --exclude '*' --include '*.zip' --delete /path/to/stale-branches s3://your-bucket-name/
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-
-      - name: Get output
-        run: "echo 'Deleted branches: ${{ steps.delete_stuff.outputs.deleted_branches }}'"
-
+      - name: Output Docker image digest
+        run: echo "Docker Image Digest - ${{ steps.docker_build_push.outputs.digest }}"
