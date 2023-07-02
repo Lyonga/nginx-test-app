@@ -22,7 +22,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   container_definitions    = <<DEFINITION
   [
     {
-      "name": "my-first-task",
+      "name": "ecs-task",
       "image": "docker.io/lyonga/launch:latest",
       "essential": true,
       "portMappings": [
@@ -61,7 +61,7 @@ resource "aws_ecs_service" "ecs-service" {
     security_groups = [aws_security_group.ecs_security_group.id]
   }
 
-  name            = "testwebapp"
+  name            = "ecs-task"
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
 }
 
