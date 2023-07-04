@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   [
     {
       "name": "ecs-task",
-      "image": "lyonga/launch:latest",
+      "image": "docker.io/lyonga/launch:latest",
       "essential": true,
       "portMappings": [
         {
@@ -51,7 +51,7 @@ resource "aws_ecs_service" "ecs-service" {
 
   load_balancer {
     target_group_arn = "${aws_lb_target_group.ecs_target_group.arn}"
-    container_name   = "app"
+    container_name   = "ecs-task""
     container_port   = 3000
   }
 
@@ -62,7 +62,7 @@ resource "aws_ecs_service" "ecs-service" {
   }
 
   name            = "ecs-task"
-  task_definition = aws_ecs_task_definition.ecs_task_definition.arn
+  task_definition = "{aws_ecs_task_definition.ecs_task_definition.arn}"
 }
 
 # Create a security group
