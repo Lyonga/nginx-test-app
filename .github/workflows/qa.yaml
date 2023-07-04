@@ -1,37 +1,36 @@
-name: ECR AND DOCKERHUB
-
-on:
-  push:
-    branches:
-      - 'master'
-
+name: Cypress Docker Push
+on: 
+  push: 
+    branches: [ "master" ]
+  
 jobs:
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build and push to DockerHub
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: lyonga/launch:latest
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry: public.ecr.aws/v1j1f0e5/lyonga/launch
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      - name: Build and push to ECR
-        run: |
-          docker build -t lyonga/launch .
-          docker tag lyonga/launch:latest public.ecr.aws/v1j1f0e5/lyonga/launch:latest
-          docker push public.ecr.aws/v1j1f0e5/lyonga/launch:latest
+  Build:
+   
+  
+    name: Build Docker Image
+    runs-on: ubuntu-latest  
+    steps:  
+        - name: Checkout
+          uses: actions/checkout@v2    
+          
+        - name: Setup AWS ECR Details
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{secrets.AWS_REGION}}
+
+
+        - name: Login to Amazon ECR
+          id: login-pf-aws-ecr
+          uses: aws-actions/amazon-ecr-login@v1
+          
+
+        - name: Build and push the tagged docker image to Amazon ECR
+          env:
+            ECR_REGISTRY: ${{ steps.login-pf-aws-ecr.outputs.registry }}
+            ECR_REPOSITORY: lyonga/launch
+            IMAGE_TAG: latest
+          run: |
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
