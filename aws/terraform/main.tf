@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   [
     {
       "name": "ecs-task",
-      "image": "docker.io/lyonga/launch:latest",
+      "image": "lyonga/launch:latest",
       "essential": true,
       "portMappings": [
         {
