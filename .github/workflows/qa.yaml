@@ -29,6 +29,7 @@ jobs:
           registry: public.ecr.aws/v1j1f0e5/lyonga/launch
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
       - name: Build and push to ECR
         run: |
           docker build -t lyonga/launch .
