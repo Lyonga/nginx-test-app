@@ -18,7 +18,7 @@ resource "aws_ecs_cluster" "test" {
 
 # Create a task definition
 resource "aws_ecs_task_definition" "ecs_task_definition" {
-  family                   = "my-ecs-service-task"
+  family                   = "ecs-task"
   container_definitions    = <<DEFINITION
   [
     {
@@ -41,6 +41,9 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   memory                   = 512         # Specifying the memory our container requires
   cpu                      = 256         # Specifying the CPU our container requires
   execution_role_arn       = "${aws_iam_role.ecsTaskExecutionRole.arn}"
+}
+data "aws_ecs_task_definition" "TD" {
+  task_definition = aws_ecs_task_definition.ecs_task_definition.family
 }
 
 resource "aws_ecs_service" "ecs-service" {
