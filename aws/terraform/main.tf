@@ -52,7 +52,7 @@ resource "aws_ecs_service" "ecs-service" {
 
   load_balancer {
     target_group_arn = "${aws_lb_target_group.ecs_target_group.arn}"
-    container_name   = "${aws_ecs_task_definition.ecs_task_definition.family}"
+    container_name   = "ecs-task"
     container_port   = 3000
   }
 
