@@ -17,7 +17,7 @@ resource "aws_ecs_cluster" "test" {
 }
 
 # Create a task definition
-resource "aws_ecs_task_definition" "ecs_task_definition" {
+resource "aws_ecs_task_definition" "ecs_task {
   family                   = "ecs-task"
   container_definitions    = <<DEFINITION
   [
@@ -43,7 +43,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   execution_role_arn       = "${aws_iam_role.ecsTaskExecutionRole.arn}"
 }
 data "aws_ecs_task_definition" "TD" {
-  task_definition = aws_ecs_task_definition.ecs_task_definition.family
+  task_definition = aws_ecs_task_definition.ecs_task.family
 }
 
 resource "aws_ecs_service" "ecs-service" {
@@ -55,7 +55,7 @@ resource "aws_ecs_service" "ecs-service" {
 
   load_balancer {
     target_group_arn = "${aws_lb_target_group.ecs_target_group.arn}"
-    container_name   = "${aws_ecs_task_definition.ecs_task_definition.family}"
+    container_name   = "${aws_ecs_task_definition.ecs_task.family}"
     container_port   = 3000
   }
 
