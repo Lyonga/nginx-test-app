@@ -49,13 +49,15 @@ data "aws_ecs_task_definition" "TD" {
 resource "aws_ecs_service" "ecs-service" {
   cluster                 = aws_ecs_cluster.test.id
   desired_count           = 1
+  platform_version        = "LATEST"
   launch_type     = "FARGATE"
-  #enable_ecs_managed_tags = true
-  #force_new_deployment    = true
+  enable_ecs_managed_tags = true
+  force_new_deployment    = true
 
   load_balancer {
     target_group_arn = "${aws_lb_target_group.ecs_target_group.arn}"
-    container_name   = "${aws_ecs_task_definition.ecs_task.family}"
+    #container_name   = "${aws_ecs_task_definition.ecs_task.family}"
+    container_name    = "ecs-task"
     container_port   = 3000
   }
 
