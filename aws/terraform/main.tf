@@ -18,7 +18,7 @@ resource "aws_ecs_cluster" "test" {
 
 # Create a task definition
 resource "aws_ecs_task_definition" "ecs_task_definition" {
-  family                   = "ecs-task"
+  family                   = "my-ecs-service-task"
   container_definitions    = <<DEFINITION
   [
     {
