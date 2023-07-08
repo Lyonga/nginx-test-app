@@ -66,7 +66,7 @@ resource "aws_ecs_service" "ecs-service" {
   }
 
   name            = "ecs-task"
-  task_definition = "{aws_ecs_task_definition.ecs_task_definition.arn}"
+  task_definition = "{aws_ecs_task_definition.ecs_task.arn}"
 }
 
 # Create a security group
