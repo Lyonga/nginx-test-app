@@ -138,13 +138,50 @@ data "aws_iam_policy_document" "assume_role_policy" {
       identifiers = ["ecs-tasks.amazonaws.com"]
     }
   }
+
   statement {
     actions   = ["ecr:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    actions   = [
+      "ecs:RunTask",
+      "ecs:StopTask",
+      "ecs:DescribeTasks",
+      "ecs:ListTasks",
+      "ecs:DescribeContainerInstances",
+      "ecs:DescribeTaskDefinition",
+      "ecs:DescribeServices",
+      "ecs:UpdateService",
+      "ecs:CreateCluster",
+      "ecs:RegisterTaskDefinition",
+      "elasticloadbalancing:RegisterTargets",
+      "elasticloadbalancing:DeregisterTargets",
+      "elasticloadbalancing:DescribeTargetGroups",
+      "elasticloadbalancing:DescribeListeners",
+      "elasticloadbalancing:DescribeRules",
+      "elasticloadbalancing:CreateRule",
+      "elasticloadbalancing:ModifyRule",
+      "elasticloadbalancing:DeleteRule",
+      "elasticloadbalancing:SetRulePriorities"
+    ]
     resources = ["*"]
   }
 }
 
 resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
-  role       = "${aws_iam_role.ecsTaskExecutionRole.name}"
+  role       = aws_iam_role.ecsTaskExecutionRole.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+
+resource "aws_iam_policy" "ecsTaskExecutionPolicy" {
+  name   = "ecsTaskExecutionPolicy"
+  policy = data.aws_iam_policy_document.assume_role_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_custom_policy_attachment" {
+  role       = aws_iam_role.ecsTaskExecutionRole.name
+  policy_arn = aws_iam_policy.ecsTaskExecutionPolicy.arn
+}
+
