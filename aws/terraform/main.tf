@@ -26,7 +26,7 @@ resource "aws_ecs_task_definition" "TDD" {
   container_definitions = jsonencode([
     {
       name      = "main-container"
-      image     = "612958166077.dkr.ecr.us-east-1.amazonaws.com/test:latest"
+      image     = "612958166077.dkr.ecr.us-east-1.amazonaws.com/test:new"
       cpu       = 1024
       memory    = 2048
       essential = true
