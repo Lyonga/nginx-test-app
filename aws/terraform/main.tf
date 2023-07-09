@@ -93,6 +93,7 @@ resource "aws_security_group" "ecs_security_group" {
 resource "aws_lb" "ecs_load_balancer" {
   name               = "ecs-load-balancer"
   load_balancer_type = "application"
+  internal           = false
   subnets            = ["subnet-836b2f8d", "subnet-ec81d3a1"]  
 
   security_groups = [aws_security_group.ecs_security_group.id]
