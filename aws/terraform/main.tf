@@ -16,7 +16,6 @@ resource "aws_ecs_cluster" "test" {
   }
 }
 
-# Create a task definition
 resource "aws_ecs_task_definition" "ecs_task" {
   family                   = "Nginx-TD"
   container_definitions    = <<DEFINITION
