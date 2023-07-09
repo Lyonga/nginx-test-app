@@ -97,6 +97,9 @@ resource "aws_lb" "ecs_load_balancer" {
   subnets            = ["subnet-836b2f8d", "subnet-ec81d3a1"]  
 
   security_groups = [aws_security_group.ecs_security_group.id]
+  tags = {
+    Name = "L and L"
+  }
 }
 
 # Create a target group for the load balancer
