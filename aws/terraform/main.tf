@@ -103,15 +103,9 @@ resource "aws_lb_target_group" "ecs_target_group" {
   name        = "ecs-test-target-group"
   port        = 80
   protocol    = "HTTP"
+  target_type = "ip"
   vpc_id      = "vpc-8f8856f2"  
-  lifecycle {
-    ignore_changes = all
-  }
 
-  health_check {
-    path = "/"
-    port = 80
-  }
 }
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = "${aws_lb.ecs_load_balancer.arn}" 
