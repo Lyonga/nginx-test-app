@@ -135,36 +135,6 @@ data "aws_iam_policy_document" "assume_role_policy" {
       identifiers = ["ecs-tasks.amazonaws.com"]
     }
   }
-
-  statement {
-    actions   = ["ecr:*"]
-    resources = ["*"]
-  }
-
-  statement {
-    actions   = [
-      "ecs:RunTask",
-      "ecs:StopTask",
-      "ecs:DescribeTasks",
-      "ecs:ListTasks",
-      "ecs:DescribeContainerInstances",
-      "ecs:DescribeTaskDefinition",
-      "ecs:DescribeServices",
-      "ecs:UpdateService",
-      "ecs:CreateCluster",
-      "ecs:RegisterTaskDefinition",
-      "elasticloadbalancing:RegisterTargets",
-      "elasticloadbalancing:DeregisterTargets",
-      "elasticloadbalancing:DescribeTargetGroups",
-      "elasticloadbalancing:DescribeListeners",
-      "elasticloadbalancing:DescribeRules",
-      "elasticloadbalancing:CreateRule",
-      "elasticloadbalancing:ModifyRule",
-      "elasticloadbalancing:DeleteRule",
-      "elasticloadbalancing:SetRulePriorities"
-    ]
-    resources = ["*"]
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
