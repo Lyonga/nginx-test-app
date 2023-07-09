@@ -16,58 +16,60 @@ resource "aws_ecs_cluster" "test" {
   }
 }
 
-resource "aws_ecs_task_definition" "ecs_task" {
-  family                   = "Nginx-TD"
-  container_definitions    = <<DEFINITION
-  [
-    {
-      "name": "ecs-task",
-      "image": "612958166077.dkr.ecr.us-east-1.amazonaws.com/test:latest",
-      "essential": true,
-      "portMappings": [
-        {
-          "containerPort": 3000,
-          "hostPort": 3000
-        }
-      ],
-      "memory": 512,
-      "cpu": 256
-    }
-  ]
-  DEFINITION
-  requires_compatibilities = ["FARGATE"] # Stating that we are using ECS Fargate
-  network_mode             = "awsvpc"    # Using awsvpc as our network mode as this is required for Fargate
-  memory                   = 512         # Specifying the memory our container requires
-  cpu                      = 256         # Specifying the CPU our container requires
+resource "aws_ecs_task_definition" "TDD" {
+  family                   = "Nginx-TDD"
+  requires_compatibilities = ["FARGATE"]
   execution_role_arn       = "${aws_iam_role.ecsTaskExecutionRole.arn}"
+  network_mode             = "awsvpc"
+  cpu                      = 1024
+  memory                   = 2048
+  container_definitions = jsonencode([
+    {
+      name      = "main-container"
+      image     = "612958166077.dkr.ecr.us-east-1.amazonaws.com/test:latest"
+      cpu       = 1024
+      memory    = 2048
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort      = 80
+        }
+      ]
+    }
+  ])
 }
-data "aws_ecs_task_definition" "TD" {
-  task_definition = aws_ecs_task_definition.ecs_task.family
+
+
+data "aws_ecs_task_definition" "TDD" {
+  task_definition = aws_ecs_task_definition.TDD.family
 }
 
 resource "aws_ecs_service" "ecs-service" {
-  cluster                 = aws_ecs_cluster.test.id
-  desired_count           = 1
-  platform_version        = "LATEST"
-  launch_type     = "FARGATE"
-  enable_ecs_managed_tags = true
-  force_new_deployment    = true
+  name                               = "First-Service"
+  launch_type                        = "FARGATE"
+  platform_version                   = "LATEST"
+  cluster                            = aws_ecs_cluster.test.id
+  task_definition                    = aws_ecs_task_definition.TDD.arn
+  scheduling_strategy                = "REPLICA"
+  desired_count                      = 2
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
+  #depends_on                         = [aws_alb_listener.Listener, aws_iam_role.iam-role]
+
 
   load_balancer {
     target_group_arn = "${aws_lb_target_group.ecs_target_group.arn}"
-    #container_name   = "${aws_ecs_task_definition.ecs_task.family}"
-    container_name    = "ecs-task"
-    container_port   = 3000
+    container_name   = "main-container"
+    container_port   = 80
   }
+
 
   network_configuration {
-    subnets         = ["subnet-836b2f8d", "subnet-ec81d3a1"]
     assign_public_ip = true
-    security_groups = [aws_security_group.ecs_security_group.id]
+    security_groups  = [aws_security_group.ecs_security_group.id]
+    subnets          = ["subnet-836b2f8d", "subnet-ec81d3a1"]
   }
-
-  name            = "ecs-task"
-  task_definition = "{aws_ecs_task_definition.ecs_task.arn}"
 }
 
 # Create a security group
